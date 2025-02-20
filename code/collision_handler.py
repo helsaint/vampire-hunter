@@ -10,4 +10,4 @@ class BulletEnemyCollision:
         bullet_hits = pygame.sprite.groupcollide(
             self.bullet, self.enemy, True, True, pygame.sprite.collide_mask)
         if(bullet_hits):
-            print(bullet_hits)
+            pass

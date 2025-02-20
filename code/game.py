@@ -6,6 +6,7 @@ from random import randint, choice
 from pytmx.util_pygame import load_pygame
 from groups import AllSprites, BulletSpriteGroup
 from collision_handler import BulletEnemyCollision
+from load_images import LoadEnemyImages
 
 class Game:
     def __init__(self):
@@ -17,6 +18,7 @@ class Game:
 
         #Surfaces
         self.display_surface = pygame.display.set_mode((WINDOW_WIDTH,WINDOW_HEIGHT))
+        self.enemy_frames = LoadEnemyImages()
 
         #sprite groups
         self.all_sprites = AllSprites()
@@ -46,7 +48,8 @@ class Game:
                     self.running = False
                 elif event.type == self.enemy_event:
                     enemy = EnemySprite(self.all_sprites,self.enemy_sprites_group,
-                                        self.collision_sprites_group,
+                                        self.collision_sprites_group, 
+                                        self.enemy_frames.folders_dict,
                                         self.player, choice(self.spawn_positions))
 
             self.display_surface.fill(color="black")

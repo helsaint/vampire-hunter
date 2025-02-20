@@ -103,7 +103,8 @@ class GunSprite(pygame.sprite.Sprite):
         self.chambered()
 
 class EnemySprite(pygame.sprite.Sprite):
-    def __init__(self, all_sprites, enemy_sprite_group, collision_sprites, 
+    def __init__(self, all_sprites, enemy_sprite_group, collision_sprites,
+                 enemy_frames, 
                  player, position):
         super().__init__(all_sprites)
         self.all_sprites = all_sprites
@@ -115,7 +116,7 @@ class EnemySprite(pygame.sprite.Sprite):
         self.enemy_list = ['bat', 'blob', 'skeleton']
 
         #load enemy frames
-        self.frames = self.load_images()
+        self.frames = enemy_frames
         self.frame_index = 0
         
         self.enemy = choice(self.enemy_list)
@@ -142,19 +143,15 @@ class EnemySprite(pygame.sprite.Sprite):
         # Attack the player
         self.rect.center += self.player_direction * self.speed * dt
 
-    def load_images(self):
-        
-        folders = ["./images/enemies/bat/","./images/enemies/blob/",
-                   "./images/enemies/skeleton/"]
-        number_frames = 4
-        folders_dict = {}
-        for i in range(len(self.enemy_list)):
-            temp_list = []
-            for j in range(number_frames):
-                temp_image = pygame.image.load(folders[i] + f"{j}.png").convert_alpha()
-                temp_list.append(temp_image)
-            folders_dict[self.enemy_list[i]] = temp_list
-        return folders_dict
+    def collision(self, direction):
+        for sprite in self.collision_sprites:
+            if sprite.rect.colliderect(self.hitbox_rect):
+                if(direction == 'horizontal'):
+                    if self.direction.x > 0: self.hitbox_rect.right = sprite.rect.left
+                    if self.direction.x < 0: self.hitbox_rect.left = sprite.rect.right
+                if(direction == 'vertical'):
+                    if self.direction.y > 0: self.hitbox_rect.bottom = sprite.rect.top
+                    if self.direction.y < 0: self.hitbox_rect.top = sprite.rect.bottom
     
     def update(self, dt):
         self.animate(dt)
