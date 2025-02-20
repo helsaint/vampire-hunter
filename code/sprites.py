@@ -97,7 +97,6 @@ class GunSprite(pygame.sprite.Sprite):
                                    start_position, 
                                   self.player_direction)
             self.bullet_sprites_group.add(bullet)
-            print(bullet)
             self.shoot_time = pygame.time.get_ticks()
         self.can_shoot = False
 
@@ -134,6 +133,15 @@ class EnemySprite(pygame.sprite.Sprite):
         self.frame_index += 20*dt
         self.image = self.frames[self.enemy][int(self.frame_index)%4]
 
+    def move(self, dt):
+        # Direction to walk
+        enemy_position = pygame.Vector2(self.rect.center)
+        player_position = pygame.Vector2(self.player.rect.center)
+        self.player_direction = (player_position-enemy_position).normalize()
+
+        # Attack the player
+        self.rect.center += self.player_direction * self.speed * dt
+
     def load_images(self):
         
         folders = ["./images/enemies/bat/","./images/enemies/blob/",
@@ -150,4 +158,5 @@ class EnemySprite(pygame.sprite.Sprite):
     
     def update(self, dt):
         self.animate(dt)
+        self.move(dt)
 
