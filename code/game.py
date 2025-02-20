@@ -48,7 +48,6 @@ class Game:
                     enemy = EnemySprite(self.all_sprites,self.enemy_sprites_group,
                                         self.collision_sprites_group,
                                         self.player, choice(self.spawn_positions))
-                    print(enemy)
 
             self.display_surface.fill(color="black")
             self.all_sprites.update(dt)

@@ -2,6 +2,7 @@ import pygame
 from settings import SCALE_WIDTH, WINDOW_WIDTH, WINDOW_HEIGHT, SCALE_BULLET, CHAMBER_TIME
 from math import atan2, degrees
 from groups import BulletSpriteGroup
+from random import choice
 
 class CollisionSprites(pygame.sprite.Sprite):
     def __init__(self, surface, position, group):
@@ -112,11 +113,14 @@ class EnemySprite(pygame.sprite.Sprite):
         self.collision_sprites = collision_sprites
         self.player = player
         self.position = position
+        self.enemy_list = ['bat', 'blob', 'skeleton']
 
         #load enemy frames
         self.frames = self.load_images()
         self.frame_index = 0
-        self.image = self.frames['bat'][self.frame_index].convert_alpha()
+        
+        self.enemy = choice(self.enemy_list)
+        self.image = self.frames[self.enemy][self.frame_index]
         self.rect = self.image.get_frect(center = position)
         self.hitbox_rect = self.rect.inflate(-20,-40)
         
@@ -126,17 +130,24 @@ class EnemySprite(pygame.sprite.Sprite):
 
         self.mask = pygame.mask.from_surface(self.image)
 
+    def animate(self, dt):
+        self.frame_index += 20*dt
+        self.image = self.frames[self.enemy][int(self.frame_index)%4]
+
     def load_images(self):
-        enemy_list = ['bat', 'blob', 'skeleton']
+        
         folders = ["./images/enemies/bat/","./images/enemies/blob/",
                    "./images/enemies/skeleton/"]
         number_frames = 4
         folders_dict = {}
-        for i in range(len(enemy_list)):
+        for i in range(len(self.enemy_list)):
             temp_list = []
             for j in range(number_frames):
                 temp_image = pygame.image.load(folders[i] + f"{j}.png").convert_alpha()
                 temp_list.append(temp_image)
-            folders_dict[enemy_list[i]] = temp_list
+            folders_dict[self.enemy_list[i]] = temp_list
         return folders_dict
+    
+    def update(self, dt):
+        self.animate(dt)
 
