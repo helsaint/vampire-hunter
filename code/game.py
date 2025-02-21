@@ -5,7 +5,7 @@ from sprites import *
 from random import randint, choice
 from pytmx.util_pygame import load_pygame
 from groups import AllSprites, BulletSpriteGroup
-from collision_handler import BulletEnemyCollision
+from collision_handler import BulletEnemyCollision, BulletObjectCollision
 from load_images import LoadEnemyImages
 
 class Game:
@@ -34,6 +34,8 @@ class Game:
         #Collisions
         self.bullet_enemy_collision =BulletEnemyCollision(self.bullet_sprites_group,
                                                           self.enemy_sprites_group, self.all_sprites)
+        self.bullet_object_collision = BulletObjectCollision(self.bullet_sprites_group,
+                                                             self.collision_sprites_group)
 
         #Setup
         self.setup()
@@ -56,6 +58,7 @@ class Game:
             self.all_sprites.update(dt)
             self.all_sprites.draw(self.player.rect.center)
             self.bullet_enemy_collision.update()
+            self.bullet_object_collision.update()
             
 
             pygame.display.update()
