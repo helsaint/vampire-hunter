@@ -3,6 +3,7 @@ from settings import SCALE_WIDTH, WINDOW_WIDTH, WINDOW_HEIGHT, SCALE_BULLET, CHA
 from math import atan2, degrees
 from groups import BulletSpriteGroup
 from random import choice
+from load_images import LoadBulletImage
 
 class CollisionSprites(pygame.sprite.Sprite):
     def __init__(self, surface, position, group):
@@ -18,11 +19,9 @@ class GroundSprites(pygame.sprite.Sprite):
         self.is_background = True
 
 class BulletSprite(pygame.sprite.Sprite):
-    def __init__(self, all_sprites, position, direction):
+    def __init__(self, all_sprites, position, direction, bullet_surface):
         super().__init__(all_sprites)
-        self.bullet_surface = pygame.transform.scale(
-           pygame.image.load('./images/gun/bullet.png').convert_alpha(),
-            (SCALE_BULLET,SCALE_BULLET))
+        self.bullet_surface = bullet_surface
         self.image = self.bullet_surface
         self.rect = self.image.get_frect(center=position)
         self.direction = direction
@@ -57,6 +56,7 @@ class GunSprite(pygame.sprite.Sprite):
         self.gun_surface = pygame.transform.scale(
             pygame.image.load('./images/gun/gun.png').convert_alpha(),
             (SCALE_WIDTH,SCALE_WIDTH))
+        self.bullet_surface = LoadBulletImage().bullet_surface
         self.image = self.gun_surface
         self.rect=self.image.get_frect(center=self.player.rect.center + 
                                        self.player_direction*self.distance)
@@ -95,7 +95,7 @@ class GunSprite(pygame.sprite.Sprite):
             start_position = self.rect.center + self.player_direction * 30
             bullet = BulletSprite(self.all_sprites,
                                    start_position, 
-                                  self.player_direction)
+                                  self.player_direction, self.bullet_surface)
             self.bullet_sprites_group.add(bullet)
             self.shoot_time = pygame.time.get_ticks()
         self.can_shoot = False
@@ -141,17 +141,10 @@ class EnemySprite(pygame.sprite.Sprite):
         self.player_direction = (player_position-enemy_position).normalize()
 
         # Attack the player
-        self.rect.center += self.player_direction * self.speed * dt
+        self.hitbox_rect.x += self.player_direction.x * self.speed * dt
+        self.hitbox_rect.y += self.player_direction.y * self.speed * dt
+        self.rect.center = self.hitbox_rect.center
 
-    def collision(self, direction):
-        for sprite in self.collision_sprites:
-            if sprite.rect.colliderect(self.hitbox_rect):
-                if(direction == 'horizontal'):
-                    if self.direction.x > 0: self.hitbox_rect.right = sprite.rect.left
-                    if self.direction.x < 0: self.hitbox_rect.left = sprite.rect.right
-                if(direction == 'vertical'):
-                    if self.direction.y > 0: self.hitbox_rect.bottom = sprite.rect.top
-                    if self.direction.y < 0: self.hitbox_rect.top = sprite.rect.bottom
     
     def update(self, dt):
         self.animate(dt)
