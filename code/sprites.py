@@ -109,7 +109,7 @@ class EnemySprite(pygame.sprite.Sprite):
         super().__init__(all_sprites)
         self.all_sprites = all_sprites
         self.add(enemy_sprite_group)
-        self.add(collision_sprites)
+        #self.add(collision_sprites)
         self.collision_sprites = collision_sprites
         self.player = player
         self.position = position
@@ -141,9 +141,22 @@ class EnemySprite(pygame.sprite.Sprite):
         self.player_direction = (player_position-enemy_position).normalize()
 
         # Attack the player
+        
         self.hitbox_rect.x += self.player_direction.x * self.speed * dt
+        self.collision("horizontal")
         self.hitbox_rect.y += self.player_direction.y * self.speed * dt
+        self.collision("vertical")
         self.rect.center = self.hitbox_rect.center
+
+    def collision(self, direction):
+        for sprite in self.collision_sprites:
+            if sprite.rect.colliderect(self.hitbox_rect):
+                if(direction == 'horizontal'):
+                    if self.player_direction.x > 0: self.hitbox_rect.right = sprite.rect.left
+                    if self.player_direction.x < 0: self.hitbox_rect.left = sprite.rect.right
+                if(direction == 'vertical'):
+                    if self.player_direction.y > 0: self.hitbox_rect.bottom = sprite.rect.top
+                    if self.player_direction.y < 0: self.hitbox_rect.top = sprite.rect.bottom
 
     
     def update(self, dt):
